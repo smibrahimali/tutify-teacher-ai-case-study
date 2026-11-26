@@ -22,6 +22,8 @@ High-level ADRs for MaryamBot. No proprietary schemas, source, or credentials â€
 
 **Consequence:** Teachers always see student, PKT date, and time/duration before commit; retries are safe; mid-flow topic switches can soft-gate with Continue / Start over.
 
+**Operational detail:** Civil dates are locked to `Asia/Karachi` â€” today or the past 10 calendar days; future dates are rejected. Ambiguous surnames open a disambiguation picker without dropping captured time slots.
+
 ---
 
 ## ADR-03 â€” Server-Side RBAC & Financial Field Exclusion
@@ -32,6 +34,8 @@ High-level ADRs for MaryamBot. No proprietary schemas, source, or credentials â€
 
 **Consequence:** Cross-teacher privacy by construction; reports stay within allowed fields; RLS plus service-role write boundaries reinforce the same isolation at persistence.
 
+**Operational detail:** Confirmed session writes invalidate TanStack Query caches so the portal Sessions view updates immediately after atomic confirm.
+
 ---
 
 ## ADR-04 â€” Fail-Closed Feature Flags
@@ -41,3 +45,5 @@ High-level ADRs for MaryamBot. No proprietary schemas, source, or credentials â€
 **Why:** Staged teacher allowlists and write kill-switches reduce blast radius during internship delivery and post-ship hardening.
 
 **Consequence:** Safe progressive rollout; builds and deploys remain safe without API keys or with flags off; ops can disable writes without a code change.
+
+**Operational detail:** UX ships as a floating launcher and branded chat sheet (mobile bottom sheet / desktop popover) with student picker, bounded PKT calendar, and structured report cards. Regression coverage: Vitest `MB-01`â€“`MB-10`.

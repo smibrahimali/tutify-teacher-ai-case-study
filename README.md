@@ -4,16 +4,16 @@
 
 <br/>
 
-**Teacher-only AI assistant** for session logging and self-service reports — propose-then-confirm writes, server-enforced RBAC, shipped into [portal.tutify.org](https://portal.tutify.org/).
+**Teacher-only AI assistant** — propose-then-confirm session logging with server-enforced RBAC, shipped into [portal.tutify.org](https://portal.tutify.org/).
 
 <br/>
 
 <a href="https://portal.tutify.org/">
-  <img src="https://img.shields.io/badge/Live_Portal-E4E4E7?style=flat-square&labelColor=161B22&color=E4E4E7" alt="Live Portal" />
+  <img src="https://img.shields.io/badge/LIVE_PORTAL-E4E4E7?style=for-the-badge&labelColor=161B22&color=E4E4E7" alt="Live Portal" />
 </a>
 &nbsp;
 <a href="https://github.com/smibrahimali">
-  <img src="https://img.shields.io/badge/Back_to_Profile-161B22?style=flat-square&labelColor=0D1117&color=161B22" alt="Back to Profile" />
+  <img src="https://img.shields.io/badge/BACK_TO_PROFILE-161B22?style=for-the-badge&labelColor=0D1117&color=161B22" alt="Back to Profile" />
 </a>
 
 </div>
@@ -24,29 +24,51 @@
 
 ### The Problem & Workflow Shift
 
-Logging lessons meant bouncing across student, enrollment, time-entry, and reporting screens. MaryamBot collapses that into a guided teacher-only chat inside the portal.
-
-| Legacy portal flow | MaryamBot guided flow |
-| --- | --- |
-| Open student → pick enrollment cycle → enter PKT window or duration → save / submit → check hours and earnings on separate views | Chat or quick actions → resolve student → PKT date + time or duration → review card → draft or submit → in-chat reports |
+| Workflow | Legacy Portal | MaryamBot |
+| --- | --- | --- |
+| **Session Logging** | Multi-screen student → cycle → time → save | Guided chat: student → PKT → review |
+| **Ambiguous Names** | Manual search across roster screens | In-chat picker; time slots preserved |
+| **Write Safety** | Immediate save with little confirm UX | Propose → review card → atomic confirm |
+| **Hours & Earnings** | Separate reporting views | In-chat structured report cards |
 
 ### System Architecture
 
 ```mermaid
 flowchart LR
-  A[Heuristics] --> B[Groq JSON + Zod]
-  B --> C[Server RBAC]
-  C --> D[Propose / Review Card]
-  D --> E[Atomic Confirm + Cache Invalidation]
+  I[Teacher Input] --> H[Heuristics]
+  H -->|Guided / Chip| R[Server RBAC]
+  H -->|Free-Form| G[Groq JSON + Zod]
+  G --> R
+  R --> P[Propose / Review Card]
+  P --> C[Atomic Confirm + Cache Invalidation]
 ```
 
-**RBAC & Financial Isolation** — `teacher_id` is resolved from the authenticated Supabase SSR session only. Every enrollment, session, and pay-term lookup is scoped to that teacher; internal client billing and margin fields are excluded. Persistence sits behind Postgres RLS and fail-closed flags (`ASSISTANT_MODE`, `ASSISTANT_ALLOWED_TEACHER_IDS`, `ASSISTANT_WRITES_ENABLED`).
-
-**Hybrid Orchestration** — Quick-action chips, menus, and clarifications hit a deterministic heuristic parser first (zero tokens). Free-form prompts fall through to Groq with low-temperature, Zod-validated JSON — structured intent only, never SQL, raw IDs, or direct writes.
-
-**Propose-Then-Confirm Guardrails** — Chat never writes sessions directly. Validated intents create a pending review card; confirmation atomically claims the action, re-checks ownership and PKT date bounds (`Asia/Karachi`, today or past 10 calendar days, no future dates), and releases the lock on failure so retries cannot duplicate records.
-
-**Portal UX & Feature Flags** — Floating launcher and branded chat sheet across teacher routes (mobile bottom sheet / desktop popover), with student picker, bounded PKT calendar, and structured report cards. Confirmed writes invalidate TanStack Query caches so the Sessions view updates immediately. Flags fail closed; Vitest covers `MB-01`–`MB-10`.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <b>RBAC &amp; Financial Isolation</b><br/><br/>
+      Session-derived teacher identity only.<br/>
+      Scoped reads; billing margins never exposed.
+    </td>
+    <td width="50%" valign="top">
+      <b>Hybrid Orchestration</b><br/><br/>
+      Heuristics first — zero tokens for chips.<br/>
+      Free-form → Groq JSON, Zod-validated intent.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <b>Propose-Then-Confirm</b><br/><br/>
+      Chat never writes sessions directly.<br/>
+      Atomic claim on confirm; safe retries.
+    </td>
+    <td width="50%" valign="top">
+      <b>Portal UX &amp; Feature Flags</b><br/><br/>
+      Floating launcher + chat across teacher routes.<br/>
+      Fail-closed flags; Vitest <code>MB-01</code>–<code>MB-10</code>.
+    </td>
+  </tr>
+</table>
 
 ### Interface Walkthrough *(Synthetic Seed Data)*
 
@@ -57,14 +79,14 @@ flowchart LR
       <br/><br/>
       <img src="./screenshots/01-launcher.png" alt="Teacher portal with MaryamBot launcher" width="100%" />
       <br/><br/>
-      <sub>Teacher portal home with the floating MaryamBot launcher in the bottom-right corner.</sub>
+      <sub>Floating launcher on the teacher portal home.</sub>
     </td>
     <td width="50%" valign="top">
       <b>2. Chat Open &amp; Quick Actions</b>
       <br/><br/>
       <img src="./screenshots/02-chat-open.png" alt="Chat open with quick actions" width="100%" />
       <br/><br/>
-      <sub>Session logging prioritized up front, with Teaching hours, Earnings, and My students in the quick menu.</sub>
+      <sub>Chat open with session logging quick actions.</sub>
     </td>
   </tr>
   <tr>
@@ -73,14 +95,14 @@ flowchart LR
       <br/><br/>
       <img src="./screenshots/03-student-picker.png" alt="Guided session logging student picker" width="100%" />
       <br/><br/>
-      <sub>Scoped roster picker resolving ambiguous names while preserving already-entered time slots.</sub>
+      <sub>Roster picker for ambiguous names, slots kept.</sub>
     </td>
     <td width="50%" valign="top">
       <b>4. Propose-Then-Confirm Review Card</b>
       <br/><br/>
       <img src="./screenshots/04-review-card.png" alt="Review card before creating session" width="100%" />
       <br/><br/>
-      <sub>Verification card offering <i>Log &amp; submit</i> or <i>Save as draft</i> before atomic insertion.</sub>
+      <sub>Review card before draft or submit confirm.</sub>
     </td>
   </tr>
   <tr>
@@ -89,7 +111,7 @@ flowchart LR
       <br/><br/>
       <img src="./screenshots/05-hours-report.png" alt="Teaching hours structured answer card" width="100%" />
       <br/><br/>
-      <sub>In-chat hours and session count breakdown rendered as structured summary cards.</sub>
+      <sub>In-chat hours and session count summary cards.</sub>
     </td>
   </tr>
 </table>

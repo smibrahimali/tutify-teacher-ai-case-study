@@ -55,39 +55,50 @@ The goal was to build **MaryamBot**, an embedded, teacher-only conversational as
 
 <br/>
 
-### ✦ Interface Walkthrough *(Synthetic Seed Data)*
+### ✦ Interface Walkthrough *(Local Synthetic Demo Data)*
+
+*All screenshots below use local synthetic demo data (`Test Teacher` and fixture student records).*
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <b>◈ &nbsp;1. Teacher Portal Entry &amp; Welcome</b>
+      <b>◈ &nbsp;1. Teacher Portal Entry Point</b>
       <br/><br/>
-      <img src="./assets/01-welcome-launcher.png" alt="Welcome Launcher" width="100%" />
+      <img src="./screenshots/01-launcher.png" alt="Teacher portal with MaryamBot launcher" width="100%" />
       <br/><br/>
-      <sub>Floating launcher and branded assistant sheet with quick-start logging and reporting triggers.</sub>
+      <sub>Teacher portal home view with the floating MaryamBot launcher in the bottom-right corner.</sub>
     </td>
     <td width="50%" valign="top">
-      <b>❖ &nbsp;2. Student Picker &amp; Disambiguation</b>
+      <b>❖ &nbsp;2. Chat Open &amp; Quick Actions</b>
       <br/><br/>
-      <img src="./assets/02-student-picker.png" alt="Student Picker" width="100%" />
+      <img src="./screenshots/02-chat-open.png" alt="Chat open with quick actions" width="100%" />
       <br/><br/>
-      <sub>Scoped roster picker resolving ambiguous names while preserving already-entered time slots.</sub>
+      <sub>Session logging prioritized up front, with Teaching hours, Earnings, and My students in the quick menu.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <b>⊹ &nbsp;3. Bounded PKT Calendar</b>
+      <b>⊹ &nbsp;3. Scoped Student Picker</b>
       <br/><br/>
-      <img src="./assets/03-pkt-calendar.png" alt="PKT Calendar" width="100%" />
+      <img src="./screenshots/03-student-picker.png" alt="Guided session logging student picker" width="100%" />
       <br/><br/>
-      <sub>Asia/Karachi date selector enforcing the 10-day lookback window and blocking future dates.</sub>
+      <sub>Guided session logging with a searchable, teacher-scoped student roster picker.</sub>
     </td>
     <td width="50%" valign="top">
       <b>◎ &nbsp;4. Propose-Then-Confirm Review Card</b>
       <br/><br/>
-      <img src="./assets/04-review-confirm.png" alt="Review Card" width="100%" />
+      <img src="./screenshots/04-review-card.png" alt="Review card before creating session" width="100%" />
       <br/><br/>
       <sub>Explicit verification card offering <i>Log &amp; submit</i> or <i>Save as draft</i> before atomic database insertion.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" valign="top">
+      <b>✦ &nbsp;5. Structured Teaching Hours Report</b>
+      <br/><br/>
+      <img src="./screenshots/05-hours-report.png" alt="Teaching hours structured answer card" width="100%" />
+      <br/><br/>
+      <sub>In-chat hours and session count breakdown rendered as structured summary cards.</sub>
     </td>
   </tr>
 </table>
@@ -112,3 +123,12 @@ The goal was to build **MaryamBot**, an embedded, teacher-only conversational as
 <img src="https://img.shields.io/badge/Feature_Flags-161B22?style=flat-square" />
 
 </div>
+
+<br/>
+
+### ✦ What This Demonstrates
+
+* **Product-minded AI integration** embedded directly into existing multi-role portal workflows rather than built as a standalone chat wrapper.
+* **Server-side auth and scoping discipline** ensuring multi-tenant isolation and strict separation of teacher vs. internal financial data.
+* **Constrained, structured LLM usage** paired with deterministic heuristics, Zod validation, and graceful fallbacks.
+* **Safe, idempotent write paths** using propose-then-confirm review cards, atomic claims, and fail-closed feature flags.

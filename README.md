@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/banner.svg" alt="MaryamBot — Tutify Portal Engineering Case Study" width="100%" />
+<img src="./assets/banner.svg" alt="MaryamBot - Tutify Portal Engineering Case Study" width="100%" />
 
 <br/><br/>
 
